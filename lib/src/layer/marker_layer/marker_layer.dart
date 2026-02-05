@@ -30,12 +30,20 @@ class MarkerLayer extends StatefulWidget {
   /// markers. Use a widget inside [Marker.child] to perform this.
   final bool rotate;
 
+  /// Whether to cull markers that are outside the visible viewport.
+  ///
+  /// When `true` (default), markers outside [MapCamera.pixelBounds] are not
+  /// rendered to improve performance. Set to `false` in widget tests where
+  /// viewport calculations may differ from actual rendering.
+  final bool enableViewportCulling;
+
   /// Create a new [MarkerLayer] to use inside of [FlutterMap.children].
   const MarkerLayer({
     super.key,
     required this.markers,
     this.alignment = Alignment.center,
     this.rotate = false,
+    this.enableViewportCulling = true,
   });
 
   @override
@@ -122,13 +130,14 @@ class _MarkerLayerState extends State<MarkerLayer> {
             Positioned? getPositioned(double worldShift) {
               final shiftedX = pxPoint.dx + worldShift;
 
-              // Cull if out of bounds
-              if (!pixelBounds.overlaps(
-                Rect.fromPoints(
-                  Offset(shiftedX + left, pxPoint.dy - bottom),
-                  Offset(shiftedX - right, pxPoint.dy + top),
-                ),
-              )) {
+              // Cull if out of bounds (skip culling when disabled for tests)
+              if (widget.enableViewportCulling &&
+                  !pixelBounds.overlaps(
+                    Rect.fromPoints(
+                      Offset(shiftedX + left, pxPoint.dy - bottom),
+                      Offset(shiftedX - right, pxPoint.dy + top),
+                    ),
+                  )) {
                 return null;
               }
 
