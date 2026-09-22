@@ -178,7 +178,7 @@ class _MarkerLayerState extends State<MarkerLayer> {
             // that direction will also be.
             // Note: Skip world-wrapping when culling is disabled, as the loops
             // rely on culling to terminate (no culling = infinite loop).
-            if (worldWidth == 0 || !enableViewportCulling) continue;
+            if (worldWidth == 0 || !widget.enableViewportCulling) continue;
             for (double shift = -worldWidth;; shift -= worldWidth) {
               final additional = getPositioned(shift);
               if (additional == null) break;
