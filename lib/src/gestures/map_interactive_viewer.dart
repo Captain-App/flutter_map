@@ -153,6 +153,19 @@ class MapInteractiveViewerState extends State<MapInteractiveViewer>
   }
 
   @override
+  void didUpdateWidget(MapInteractiveViewer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // FlutterMap accepts a new MapController while mounted. Rebind to it, or
+    // the new controller has no viewer (its first move throws before emitting,
+    // so no tiles load) and this viewer keeps rebuilding from the old camera.
+    if (oldWidget.controller != widget.controller) {
+      oldWidget.controller.removeListener(onMapStateChange);
+      widget.controller.interactiveViewerState = this;
+      widget.controller.addListener(onMapStateChange);
+    }
+  }
+
+  @override
   void didChangeDependencies() {
     // _createGestures uses a MediaQuery to determine gesture settings. This
     // will update those gesture settings if they change.
